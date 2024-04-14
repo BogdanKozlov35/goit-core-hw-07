@@ -106,20 +106,21 @@ class AddressBook(UserDict):
                     congratulation_date_str = birthday_this_year.strftime('%Y.%m.%d')
                     upcoming_birthdays.append({"name": name, "congratulation_date": congratulation_date_str})
 
-        return upcoming_birthdays
+        return f" birthdays nearest 7 days: {upcoming_birthdays}"
+
 @input_error
 def add_contact(args):
     name, phone, *_ = args
+    record = book.find(name)
     message = "Contact updated."
-    if name not in book.data:
+    if record is None:
         record = Record(name)
-        if phone:
-            record.add_phone(phone)
         book.add_record(record)
-        message = "Contact added"
-    else:
-        message = "Contact already exists"
+        message = "Contact added."
+    if phone:
+        record.add_phone(phone)
     return message
+
 @input_error
 def add_birthday(args):
     name, birthday = args
@@ -149,8 +150,8 @@ def all_contact():
             birthday = record.birthday.value
         else:
             birthday = ""
-        lines.append(f"| {name:<20} | {phones:<20} | {birthday:<20} |")
-    header = "| {:<20} | {:<20} | {:<20} |".format("Name", "Phones", "Birthday")
+        lines.append(f"| {name:<20} | {phones:<50} | {birthday:<20} |")
+    header = "| {:<20} | {:<50} | {:<20} |".format("Name", "Phones", "Birthday")
     separator = "-" * len(header)
     return "\n".join([separator, header, separator] + lines + [separator])
 @input_error
